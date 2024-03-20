@@ -9,9 +9,13 @@ pub fn BlogPage() -> impl IntoView {
         <div class=" flex-grow ">
             <div class="flex flex-col h-full bg-base-300 ">
                 <div class="container mx-auto px-4 py-8 flex-grow">
-                    <ul class="flex flex-wrap bg-base-200 rounded-box h-full space-y-4">
+                    <div class="flex flex-wrap bg-base-200 rounded-box h-full space-y-4 w-full">
                         <Transition fallback=move || {
-                            view! { <span class="loading loading-spinner loading-md"></span> }
+                            view! {
+                                <div class="flex justify-center text-center w-full">
+                                    <span class="loading loading-spinner loading-md"></span>
+                                </div>
+                            }
                         }>
                             {blog
                                 .get()
@@ -44,7 +48,7 @@ pub fn BlogPage() -> impl IntoView {
                                 })}
 
                         </Transition>
-                    </ul>
+                    </div>
                 </div>
                 <div class="join flex-none justify-center items-end">
                     <div class="mb-10">
@@ -91,7 +95,7 @@ pub struct Metadata{
     title:String,
     date:String,
     summary:String,
-    link:String
+    pub link:String
 }
 
 // 实现Deserialize，以便可以自定义反序列化过程
@@ -112,7 +116,7 @@ impl<'de> Deserialize<'de> for Metadata {
         let temp_meta = TempMetadata::deserialize(deserializer)?;
 
         // 然后，基于title生成link
-        let link = temp_meta.title.to_lowercase().replace(" ", "-") + "#"+temp_meta.date.as_str();
+        let link = temp_meta.title.to_lowercase().replace(" ", "-") + "-"+ temp_meta.date.as_str();
         // 最后，返回填充完整的Metadata实例
         Ok(Metadata {
             title: temp_meta.title,

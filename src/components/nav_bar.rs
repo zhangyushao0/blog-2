@@ -28,7 +28,7 @@ pub fn NavBar() -> impl IntoView {
                     class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-24"
                 >
                     <li>
-                        <A href="/blog/1">"博客"</A>
+                        <A href="/blog">"博客"</A>
                     </li>
                     <li>
                         <A href="/about">"关于我"</A>

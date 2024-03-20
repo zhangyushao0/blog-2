@@ -25,6 +25,7 @@ pulldown-cmark = "0.10.0"
 cfg-if = "1.0.0"
 serde_yaml = "0.9.31"
 
+
 [features]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
 ssr = [
