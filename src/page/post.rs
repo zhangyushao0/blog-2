@@ -15,12 +15,14 @@ pub fn PostPage() -> impl IntoView {
             }
         }>
             <article class="prose mx-auto md:prose-lg prose-pre:m-0 prose-pre:rounded-none">
-                <div inner_html=post_html
-                    .get()
-                    .map(|html| match html {
-                        Ok(html) => html,
-                        Err(e) => format!("Error: {}", e),
-                    })></div>
+                <div class="mt-8">
+                    <div inner_html=post_html
+                        .get()
+                        .map(|html| match html {
+                            Ok(html) => html,
+                            Err(e) => format!("Error: {}", e),
+                        })></div>
+                </div>
             </article>
         </Transition>
     }
@@ -47,7 +49,7 @@ if #[cfg(feature = "ssr")] {
     use std::path::Path;
     use std::path::PathBuf;
     use pulldown_cmark::{Parser, Event, Tag, Options, html};
-
+    use highlight_pulldown::highlight_with_theme;
     fn get_post_mata_by_path(path: &Path) -> Result<Metadata, ServerFnError> {
         let mut file = fs::File::open(path)?;
         let mut contents = String::new();
@@ -94,25 +96,11 @@ if #[cfg(feature = "ssr")] {
             options.insert(Options::ENABLE_STRIKETHROUGH);
             options.insert(Options::ENABLE_TASKLISTS);
             options.insert(Options::ENABLE_SMART_PUNCTUATION);
-            
-            let parser = Parser::new_ext(&post.content, options);
-            
-            let mut in_yaml = true;
+            options.insert(Options::ENABLE_YAML_STYLE_METADATA_BLOCKS);
+            let parser =  pulldown_cmark::Parser::new_ext(&post.content, options);
             let mut html_output = String::new();
-            let events: Vec<Event> = parser
-            .filter(|event| {
-                match event {
-                    Event::Start(Tag::BlockQuote) | Event::Start(Tag::Paragraph) if in_yaml => {
-                        in_yaml = false;
-                        true
-                    }
-                    _ if in_yaml => false,
-                    _ => true,
-                }
-            })
-            .collect();
-        
-        html::push_html(&mut html_output, events.into_iter());
+            let parser = highlight_with_theme(parser, "base16-ocean.dark").unwrap();
+            pulldown_cmark::html::push_html(&mut html_output, parser.into_iter());
             post.content = html_output;
             Ok(post)
 
